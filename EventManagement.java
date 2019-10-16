@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+import java.lang.*;
 /*TODO
  Generate unique receipt numbers 
  Show receipt
@@ -8,21 +10,30 @@ import java.util.Scanner;
  View registrations (only done by ADMIN)
  GUI
 */
+//set this to 1, or pass 'DEBUG' as command line arguement to enable debug messages
+//javac EventManagement.java
+//java EventManagement DEBUG
+
 public class EventManagement {
+    static int DEBUG = 0;
     static int event_ID;
     static int event_count = 0;
     StringBuilder event_list = new StringBuilder();
-
+    String[] lines;
     void create_event_file() {
         try {
             for (int i = 0; i < event_count; i++) {
                 // Creating an object of a file
                 File myObj = new File("Event" + (i + 1) + "_registration.dat");
-                if (!(myObj.createNewFile())) {
-                    System.out.println("File already exists.");
+                if (DEBUG == 1) {
+                    if (!(myObj.createNewFile())) {
+                        System.out.println("File : Event" + (i + 1) + "_registration.dat already exists.");
+                    }
                 }
             }
-            System.out.println("Event Registration files created");
+            if (DEBUG == 1) {
+                System.out.println("/*All Event Registration files created/*");
+            }
         } catch (IOException e) {
             System.out.println("An error occurred during creating registration files for Event.");
             e.printStackTrace();
@@ -39,7 +50,7 @@ public class EventManagement {
                 String event_name = myReader.nextLine();
                 // System.out.println(event_count + "." + event_name);
                 event_list.append(event_name);
-                event_list.append(",");
+                event_list.append("//");
             }
             myReader.close();
             create_event_file();
@@ -65,9 +76,10 @@ public class EventManagement {
         }
     }
 
-    void show_receipt(){
+    void show_receipt() {
 
     }
+
     public final static void clearConsole() {
         // System.out.println(new String(new char[50]).replace("\0", "\r\n"));
         // Clears Screen in java
@@ -85,17 +97,20 @@ public class EventManagement {
             System.out.println("Select the event in which you would like to participate in :");
             // Get event list from file
             get_events();
-            // System.out.println("1.Webber\n2.Webber\n3.Clash of Code\n4.Project
-            // Presentation\n5.Flash\n6.Capture");
-            String[] lines = event_list.toString().split(",");
+            lines = event_list.toString().split("//");
             int line_count = 0;
-            for (String str : lines) {
-                System.out.println(++line_count + "." + str);
+            for (int i=0; i<((event_count)); i++) {
+                delayed_println("\t\t\t" + ++line_count + "." + lines[i++]);
             }
             event_selected = S.nextInt();
         }
         clearConsole();
         return event_selected;
+    }
+
+    void event_details(int event_selected){
+        String[] event_info = lines.toString().split("\n");
+        System.out.println(event_info);
     }
 
     void enterDetails() {
@@ -135,9 +150,70 @@ public class EventManagement {
         }
     }
 
+    void drawline() {
+        int w = 60;
+        for (int i = 0; i < w; i++) {
+            System.out.print("_");
+        }
+    }
+
+    void loading() {
+        String anim = "|/-\\";
+        System.out.println("\n\n\n");
+        for (int x = 0; x < 10; x++) {
+            String data = "\r\t\t\tL O A D I N G  " + anim.charAt(x % anim.length()) + " ";
+            try {
+                System.out.write(data.getBytes());
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            } catch (IOException e) {
+            }
+        }
+        clearConsole();
+    }
+
+    void typewriter(String text) {
+        String text_to_display = text;
+        for (int i = 0; i <= text_to_display.length(); i++) {
+            System.out.print("\r" + text_to_display.substring(0, i));
+            try {
+                Thread.sleep(60);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    void delayed_println(String text) {
+        System.out.println(text);
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException e) {}
+    }
+
+    void intro() {
+        drawline();
+        System.out.print("\n\n\n");
+        typewriter("\t\t\tW E L C O M E\n");
+        typewriter("\t\t\t_____________");
+        System.out.println();
+        delayed_println("\n\t\tGovernment Polytechnic, Pune");
+        delayed_println("\t\t\t   Events");
+        event_ID = select_Event();
+        event_details(event_ID);
+        System.out.println("\n\n\n");
+    }
+
     public static void main(String[] args) {
+        try {
+            if ((args[0].equals("DEBUG")) || (args[0].equals("debug"))) {
+                DEBUG = 1;
+                System.out.println("*/DEBUG MODE ON/*");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
         EventManagement E1 = new EventManagement();
-        event_ID = E1.select_Event();
-        E1.enterDetails();
+        E1.loading();
+        E1.intro();
+        //E1.enterDetails();
     }
 }
