@@ -1,2 +1,1 @@
-
-        clearConsole();
+System.out.println(phno);
