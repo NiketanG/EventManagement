@@ -5,7 +5,6 @@ import java.util.Scanner;
  Generate unique receipt numbers 
  Show receipt
  Payment ?
- View registrations (only done by ADMIN)
  GUI
 */
 public class EventManagement {
